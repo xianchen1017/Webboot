@@ -1,0 +1,12 @@
+<mapper namespace="org.example.webboot.mapper.UserMapper">
+
+    <insert id="insert" parameterType="org.example.webboot.entity.User">
+        INSERT INTO users (username, password, email)
+        VALUES (#{username}, #{password}, #{email})
+    </insert>
+
+    <select id="findByUsername" resultType="org.example.webboot.entity.User">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+
+</mapper>

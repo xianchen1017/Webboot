@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="org.example.webboot.mapper.ArticleMapper">
+    <insert id="insert" parameterType="org.example.webboot.entity.Article">
+        INSERT INTO articles (title, content, category, status, user_id)
+        VALUES (#{title}, #{content}, #{category}, #{status}, #{userId})
+    </insert>
+
+    <select id="findByUserId" resultType="org.example.webboot.entity.Article">
+        SELECT * FROM articles WHERE user_id = #{userId}
+    </select>
+</mapper>

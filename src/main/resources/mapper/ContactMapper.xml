@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.webboot.mapper.ContactMapper">
+    <resultMap id="BaseResultMap" type="org.example.webboot.entity.Contact">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="company" property="company" jdbcType="VARCHAR"/>
+        <result column="position" property="position" jdbcType="VARCHAR"/>
+        <result column="notes" property="notes" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="org.example.webboot.entity.Contact" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO contact (name, phone, email, province, city, address, company, position, notes, user_id, create_time, update_time)
+        VALUES (#{name}, #{phone}, #{email}, #{province}, #{city}, #{address}, #{company}, #{position}, #{notes}, #{userId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="org.example.webboot.entity.Contact">
+        UPDATE contact SET
+                           name = #{name},
+                           phone = #{phone},
+                           email = #{email},
+                           province = #{province},
+                           city = #{city},
+                           address = #{address},
+                           company = #{company},
+                           position = #{position},
+                           notes = #{notes},
+                           update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM contact WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM contact WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserIdAndName" resultMap="BaseResultMap">
+        SELECT * FROM contact
+        WHERE user_id = #{userId}
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY update_time DESC
+    </select>
+</mapper>
