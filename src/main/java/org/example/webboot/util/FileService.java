@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 @Service
 public class FileService {
 
-    private static final String UPLOAD_DIR = "D:/uploads/";  // 上传文件保存的目录
+    private static final String UPLOAD_DIR = "D:/JAVA SHIT/Webboot/webboot/src/main/resources/static/uploads/";  // 上传文件保存的目录
 
     public String saveAvatar(MultipartFile avatar) {
         // 获取文件名
