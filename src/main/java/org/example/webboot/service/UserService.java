@@ -8,6 +8,7 @@ import org.example.webboot.repository.UserRepository;
 import org.example.webboot.util.FileService;
 import org.example.webboot.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.example.webboot.dto.UserDTO;
@@ -35,25 +36,32 @@ public class UserService {
     @Autowired
     private FileService fileService; // 用于处理文件上传
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // 注入 PasswordEncoder
+
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);  // 假设你使用 JPA 查询
+    }
+
     public User registerUser(RegisterDTO registerDTO, MultipartFile avatar) {
-        // 保存头像文件
-        String avatarPath = fileService.saveAvatar(avatar); // 保存文件并获取路径
+        // 直接保存明文密码
+        String password = registerDTO.getPassword();  // 明文密码
 
         // 创建并保存用户
         User user = new User();
         user.setUsername(registerDTO.getUsername());
-        user.setPassword(registerDTO.getPassword()); // 这里可以加入密码加密逻辑
-        user.setAvatar(avatarPath);
+        user.setPassword(password);  // 保存明文密码
+        user.setAvatar(fileService.saveAvatar(avatar));
 
         // 保存到数据库
-        userRepository.save(user);
-
-        return user;
+        return userRepository.save(user);
     }
+
 
     public User loginUser(String username, String password) {
         User user = userMapper.findByUsername(username);
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) { // 密码比对
             return user;
         }
         return null;

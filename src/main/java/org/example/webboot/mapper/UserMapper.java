@@ -9,27 +9,27 @@ import java.util.List;
 public interface UserMapper {
 
     // 获取所有用户
-    @Select("SELECT * FROM users")
+    @Select("SELECT * FROM user")
     List<User> findAllUsers();
 
     // 根据ID获取用户
-    @Select("SELECT * FROM users WHERE id = #{id}")
+    @Select("SELECT * FROM user WHERE id = #{id}")
     User findById(int id);
 
     // 根据用户名获取用户
-    @Select("SELECT * FROM users WHERE username = #{username}")
+    @Select("SELECT * FROM user WHERE username = #{username}")
     User findByUsername(String username);  // 添加了 findByUsername 方法
 
 
     // 插入新用户
-    @Insert("INSERT INTO users (username, email, password) VALUES (#{username}, #{email}, #{password})")
+    @Insert("INSERT INTO user (username, email, password) VALUES (#{username}, #{email}, #{password})")
     void insert(User user);
 
     // 更新用户
-    @Update("UPDATE users SET username = #{username}, email = #{email}, password = #{password} WHERE id = #{id}")
+    @Update("UPDATE user SET username = #{username}, email = #{email}, password = #{password} WHERE id = #{id}")
     void update(User user);
 
     // 删除用户
-    @Delete("DELETE FROM users WHERE id = #{id}")
+    @Delete("DELETE FROM user WHERE id = #{id}")
     void delete(int id);
 }

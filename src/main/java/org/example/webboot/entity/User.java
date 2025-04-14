@@ -81,5 +81,13 @@ public class User {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+    public String getRole() {
+        return role;  // 获取用户角色
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
     // Getter and Setter methods...
 }
