@@ -116,6 +116,17 @@ public class UserService {
         return null;
     }
 
+    public boolean updatePassword(User user, String newPassword) {
+        // 密码加密处理（如果有加密需求）
+        user.setPassword(newPassword);
+
+        // 保存更新后的用户信息
+        userRepository.save(user);
+
+        return true;  // 成功更新
+    }
+
+
     /**
      * 删除用户
      * @param id 用户ID

@@ -3,6 +3,7 @@ package org.example.webboot.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.webboot.dto.LoginDTO;
+import org.example.webboot.dto.PasswordDTO;
 import org.example.webboot.dto.RegisterDTO;
 import org.example.webboot.dto.UserLoginResponse;
 import org.example.webboot.entity.User;
@@ -65,5 +66,28 @@ public class AuthController {
             return ResponseResult.error("用户名或密码错误");
         }
     }
+
+    @PostMapping("/change-password")
+    public ResponseResult changePassword(@RequestBody PasswordDTO passwordDTO) {
+        // 检查用户名和原密码
+        User user = userService.getUserByUsername(passwordDTO.getUsername());
+        if (user == null || !user.getPassword().equals(passwordDTO.getOldPassword())) {
+            return ResponseResult.error("用户名或原密码错误");
+        }
+
+        // 检查新密码和确认密码是否一致
+        if (!passwordDTO.getNewPassword().equals(passwordDTO.getConfirmPassword())) {
+            return ResponseResult.error("新密码与确认密码不一致");
+        }
+
+        // 更新密码
+        boolean isUpdated = userService.updatePassword(user, passwordDTO.getNewPassword());
+        if (isUpdated) {
+            return ResponseResult.success("密码修改成功", null);
+        } else {
+            return ResponseResult.error("密码修改失败");
+        }
+    }
+
 
 }
