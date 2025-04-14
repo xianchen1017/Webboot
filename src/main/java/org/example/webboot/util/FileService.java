@@ -11,7 +11,8 @@ import java.nio.file.Paths;
 @Service
 public class FileService {
 
-    private static final String UPLOAD_DIR = "D:/JAVA SHIT/Webboot/webboot/src/main/resources/static/uploads/";  // 上传文件保存的目录
+    // 使用相对路径，确保可以跨平台
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";  // 上传文件保存的目录
 
     public String saveAvatar(MultipartFile avatar) {
         // 获取文件名
@@ -22,7 +23,8 @@ public class FileService {
             try {
                 // 保存文件
                 Files.copy(avatar.getInputStream(), path);
-                return path.toString(); // 返回文件的路径
+                // 返回相对路径
+                return "/uploads/avatar/" + fileName; // 返回可以被前端访问的相对路径
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -61,8 +61,8 @@ public class UserService {
 
     public User loginUser(String username, String password) {
         User user = userMapper.findByUsername(username);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) { // 密码比对
-            return user;
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user;  // 确保user对象包含头像路径字段
         }
         return null;
     }

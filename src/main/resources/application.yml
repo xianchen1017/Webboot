@@ -2,8 +2,10 @@ server:
   port: 8081
 
 spring:
-  liquibase:
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  file:
+    upload-dir: static/uploads/
+    avatar-dir: avatar/
+
   datasource:
     url: jdbc:mysql://localhost:3306/webboot?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
@@ -48,6 +50,9 @@ spring:
     configuration:
       map-underscore-to-camel-case: true
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  web:
+    resources:
+      static-locations: classpath:/static/
 
 jwt:
   secret: webboot-secret-key

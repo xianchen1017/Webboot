@@ -61,7 +61,7 @@ public class AuthController {
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole());
 
             // 返回登录成功并带上 token 或其他用户数据
-            return ResponseResult.success("登录成功", token);
+            return ResponseResult.success("登录成功", user);
         } else {
             return ResponseResult.error("用户名或密码错误");
         }
