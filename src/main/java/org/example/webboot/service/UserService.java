@@ -53,6 +53,7 @@ public class UserService {
         user.setUsername(registerDTO.getUsername());
         user.setPassword(password);  // 保存明文密码
         user.setAvatar(fileService.saveAvatar(avatar));
+        user.setEmail(registerDTO.getEmail());  // 确保 email 字段被设置
 
         // 保存到数据库
         return userRepository.save(user);

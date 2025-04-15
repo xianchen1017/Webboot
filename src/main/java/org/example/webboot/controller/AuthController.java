@@ -47,7 +47,7 @@ public class AuthController {
         // 调用 UserService 注册用户
         User user = userService.registerUser(registerDTO, avatar);
 
-        return new ResponseResult("User registered successfully", user);
+        return new ResponseResult("注册成功", user);
     }
 
     @PostMapping("/login")
