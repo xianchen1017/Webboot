@@ -3,9 +3,8 @@ server:
 
 spring:
   file:
-    upload-dir: static/uploads/
-    avatar-dir: avatar/
-
+    upload-dir: D:/uploads/  # 保存上传文件的外部路径
+    avatar-dir: avatar/      # 保存头像文件的目录，相对路径
   datasource:
     url: jdbc:mysql://localhost:3306/webboot?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
@@ -52,17 +51,12 @@ spring:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   web:
     resources:
-      static-locations: classpath:/static/
-
+      static-locations: file:/D:/JAVA SHIT/web02/public/images/
 jwt:
   secret: webboot-secret-key
   expiration: 86400000 # 24 hours
   token-header: Authorization
   token-prefix: "Bearer "
-
-file:
-  upload-dir: static/uploads/
-  avatar-dir: avatar/
 
 app:
   upload:

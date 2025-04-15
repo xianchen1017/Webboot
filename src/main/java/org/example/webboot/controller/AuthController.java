@@ -55,14 +55,12 @@ public class AuthController {
         // 确保调用authenticate()方法返回的是正确的结果
         boolean isAuthenticated = authService.authenticate(loginDTO);
 
-        if (isAuthenticated) {
-            // 登录成功后，获取用户信息或生成 token
-            User user = userService.getUserByUsername(loginDTO.getUsername());
+        // 登录认证
+        User user = userService.getUserByUsername(loginDTO.getUsername());
+        if (user != null && user.getPassword().equals(loginDTO.getPassword())) {
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole());
-
-            // 返回登录成功并带上 token 或其他用户数据
             return ResponseResult.success("登录成功", user);
-        } else {
+        }else {
             return ResponseResult.error("用户名或密码错误");
         }
     }

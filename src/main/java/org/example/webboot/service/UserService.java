@@ -47,7 +47,7 @@ public class UserService {
     public User registerUser(RegisterDTO registerDTO, MultipartFile avatar) {
         // 直接保存明文密码
         String password = registerDTO.getPassword();  // 明文密码
-
+        String avatarPath = fileService.saveAvatar(avatar);  // 获取头像的相对路径
         // 创建并保存用户
         User user = new User();
         user.setUsername(registerDTO.getUsername());

@@ -7,24 +7,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileService {
-
-    // 使用相对路径，确保可以跨平台
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";  // 上传文件保存的目录
+    private static final String UPLOAD_DIR = "D:/JAVA SHIT/web02/public/images/";  // 外部路径
 
     public String saveAvatar(MultipartFile avatar) {
-        // 获取文件名
         String fileName = avatar.getOriginalFilename();
         if (fileName != null) {
-            // 创建文件路径
-            Path path = Paths.get(UPLOAD_DIR + fileName);
+            Path path = Paths.get(UPLOAD_DIR + fileName);  // 保存到 D:/JAVA SHIT/web02/public/images/ 目录下
             try {
-                // 保存文件
-                Files.copy(avatar.getInputStream(), path);
-                // 返回相对路径
-                return "/uploads/avatar/" + fileName; // 返回可以被前端访问的相对路径
+                Files.createDirectories(path.getParent());  // 确保目录存在
+                Files.copy(avatar.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                return "/images/" + fileName;  // 返回相对路径，用于前端展示
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -32,3 +28,5 @@ public class FileService {
         return null;
     }
 }
+
+
