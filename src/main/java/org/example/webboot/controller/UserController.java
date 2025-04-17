@@ -1,62 +1,57 @@
 package org.example.webboot.controller;
-//src/main/java/org/example/webboot/controller/UserController.java
-import org.example.webboot.dto.UserDTO;
-import org.example.webboot.entity.User;
-import org.example.webboot.service.UserService;
+
+import org.example.webboot.dto.ContactDTO;
+import org.example.webboot.dto.ListResult;
+import org.example.webboot.entity.Contact;
+import org.example.webboot.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private ContactService contactService;
 
-    /**
-     * 获取所有用户
-     */
+    // 用户列表的分页接口
     @GetMapping("/list")
-    public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers();
+    public ListResult<ContactDTO> getAllContacts(@RequestParam int page, @RequestParam int size) {
+        try {
+            List<ContactDTO> contacts = contactService.getAllContacts();
+            int total = contacts.size();
+            int start = (page - 1) * size;
+            int end = Math.min(start + size, total);
+            List<ContactDTO> paginatedContacts = contacts.subList(start, end);
+
+            // 返回分页数据
+            return new ListResult<>(paginatedContacts, total);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("查询联系人失败", e);
+        }
     }
 
-    /**
-     * 获取单个用户
-     * @param id 用户ID
-     */
     @GetMapping("/{id}")
-    public UserDTO getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public ContactDTO getContactById(@PathVariable int id) {
+        return contactService.getContactById(id);
     }
 
-    /**
-     * 创建新用户
-     * @param userDTO 用户数据传输对象
-     */
-    @PostMapping("/create")
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-        return userService.createUser(userDTO);
+    @PostMapping
+    public ContactDTO createContact(@RequestBody ContactDTO contactDTO) {
+        return contactService.createContact(contactDTO);
     }
 
-    /**
-     * 更新用户信息
-     * @param id 用户ID
-     * @param userDTO 用户数据传输对象
-     */
-    @PutMapping("/{id}/update")
-    public UserDTO updateUser(@PathVariable int id, @RequestBody UserDTO userDTO) {
-        return userService.updateUser(id, userDTO);
+    @PutMapping("/{id}")
+    public ContactDTO updateContact(@PathVariable int id, @RequestBody ContactDTO contactDTO) {
+        return contactService.updateContact(id, contactDTO);
     }
 
-    /**
-     * 删除用户
-     * @param id 用户ID
-     */
-    @DeleteMapping("/{id}/delete")
-    public void deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/{id}")
+    public void deleteContact(@PathVariable int id) {
+        contactService.deleteContact(id);
     }
 }
+

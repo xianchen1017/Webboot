@@ -6,6 +6,7 @@ public class RegisterDTO {
     private String password;
     private String email;
     private String birthday; // 添加 birthday 字段
+    private String role;
 
     // getters and setters
 
@@ -40,4 +41,6 @@ public class RegisterDTO {
     public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
+
+    public String getRole() { return role; }
 }

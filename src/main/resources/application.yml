@@ -29,8 +29,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    repositories:
+      enabled: true  # 确保启用 Spring Data JPA 仓库
+    show-sql: true
     properties:
       hibernate:
+        format_sql: true
+        ddl-auto: update
         dialect: org.hibernate.dialect.MySQL8Dialect
 
   servlet:
@@ -67,5 +72,12 @@ logging:
     org.example.webboot: DEBUG
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
 
 debug: true

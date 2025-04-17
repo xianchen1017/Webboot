@@ -10,5 +10,5 @@ public interface ContactMapper {
     int update(Contact contact);
     int deleteById(int id);
     Contact selectById(int id);
-    List<Contact> selectByUserIdAndName(@Param("userId") int userId, @Param("name") String name);
+    List<Contact> findAllContacts();
 }

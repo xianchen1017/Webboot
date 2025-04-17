@@ -3,13 +3,16 @@ package org.example.webboot.service;
 import org.example.webboot.dto.LoginDTO;
 import org.example.webboot.dto.RegisterDTO;
 import org.example.webboot.entity.User;
+import org.example.webboot.entity.Contact; // 新增联系人实体
 import org.example.webboot.mapper.UserMapper;
+import org.example.webboot.mapper.ContactMapper; // 新增联系人Mapper
 import org.example.webboot.repository.UserRepository;
 import org.example.webboot.util.FileService;
 import org.example.webboot.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.example.webboot.dto.ContactDTO; // 新增联系人DTO
 
 import org.example.webboot.dto.UserDTO;
 import org.example.webboot.entity.User;
@@ -29,6 +32,9 @@ public class UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private ContactMapper contactMapper; // 新增联系人Mapper
 
     @Autowired
     private UserRepository userRepository;
@@ -54,16 +60,26 @@ public class UserService {
         user.setPassword(password);  // 保存明文密码
         user.setAvatar(fileService.saveAvatar(avatar));
         user.setEmail(registerDTO.getEmail());  // 确保 email 字段被设置
-
+        user.setRole(registerDTO.getRole()); // 设置用户角色
         // 保存到数据库
         return userRepository.save(user);
     }
 
+    // 获取所有联系人
+    public List<ContactDTO> getAllContacts() {
+        List<Contact> contacts = contactMapper.findAllContacts();
+        return contacts.stream()
+                .map(contact -> new ContactDTO(contact))
+                .collect(Collectors.toList());
+    }
 
-    public User loginUser(String username, String password) {
+    // 管理员登录
+    public User adminLogin(String username, String password) {
         User user = userMapper.findByUsername(username);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user;  // 确保user对象包含头像路径字段
+        // 检查用户是否为管理员
+        if (user != null && "admin".equals(user.getRole()) &&
+                passwordEncoder.matches(password, user.getPassword())) {
+            return user;
         }
         return null;
     }
@@ -106,17 +122,18 @@ public class UserService {
      * @param id 用户ID
      * @param userDTO 用户数据
      */
+    // 更新用户信息
     public UserDTO updateUser(int id, UserDTO userDTO) {
         User user = userMapper.findById(id);
         if (user != null) {
             user.setUsername(userDTO.getUsername());
             user.setEmail(userDTO.getEmail());
+            user.setRole(userDTO.getRole());  // 更新角色
             userMapper.update(user);
             return new UserDTO(user);
         }
         return null;
     }
-
     public boolean updatePassword(User user, String newPassword) {
         // 密码加密处理（如果有加密需求）
         user.setPassword(newPassword);

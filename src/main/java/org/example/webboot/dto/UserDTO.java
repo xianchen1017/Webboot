@@ -6,7 +6,7 @@ public class UserDTO {
     private String username;
     private String email;
     private String password;  // 添加 password 字段
-
+    private String role;
 
     // Constructor from User entity
     public UserDTO(User user) {
@@ -37,5 +37,9 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;  // 设置 password
+    }
+
+    public String getRole() {
+        return role;
     }
 }
