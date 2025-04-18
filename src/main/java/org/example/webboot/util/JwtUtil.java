@@ -1,20 +1,32 @@
 package org.example.webboot.util;
 
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;
 import org.example.webboot.entity.User;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
+    @Value("${app.jwt.secret}")
     private String secretKey;
+
+    @Value("${app.jwt.expiration-in-ms}")
+    private long expirationInMs;
+
+    @Value("${app.jwt.refresh-expiration-in-ms}")
+    private long refreshExpirationInMs;
+
 
     private static final String SECRET_KEY = System.getenv("APP_SECRET_KEY");
 
@@ -95,5 +107,23 @@ public class JwtUtil {
             return null;
         }
     }
+    public boolean validateToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date()); // 如果 token 没过期，返回 true
+        } catch (Exception e) {
+            return false;  // 如果验证失败，返回 false
+        }
+    }
 
+
+    public List<GrantedAuthority> getAuthoritiesFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        List<String> roles = claims.get("roles", List.class);
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
 }

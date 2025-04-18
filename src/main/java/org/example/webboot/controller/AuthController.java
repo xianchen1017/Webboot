@@ -12,6 +12,10 @@ import org.example.webboot.util.JwtTokenProvider;
 import org.example.webboot.util.ResponseResult;
 import org.example.webboot.service.AuthService; // 导入 AuthService
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +34,9 @@ public class AuthController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;  // 注入 JwtTokenProvider
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @PostMapping("/register")
     public ResponseResult register(@RequestParam("registerDTO") String registerDTOJson,
@@ -84,6 +91,27 @@ public class AuthController {
             return ResponseResult.success("密码修改成功", null);
         } else {
             return ResponseResult.error("密码修改失败");
+        }
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            String refreshToken = request.getRefreshToken();
+            String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtTokenProvider.validateToken(refreshToken)) {
+                String newToken = jwtTokenProvider.generateToken(userDetails);
+                String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+
+                return ResponseEntity.ok(new TokenResponse(newToken, newRefreshToken));
+            }
+
+            throw new RuntimeException("Invalid refresh token");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
     }
 

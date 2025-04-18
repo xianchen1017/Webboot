@@ -51,7 +51,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteContact(@PathVariable int id) {
-        contactService.deleteContact(id);
+        contactService.deleteContact((long) id);
     }
 }
 

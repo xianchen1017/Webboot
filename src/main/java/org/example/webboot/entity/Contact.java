@@ -1,5 +1,6 @@
 package org.example.webboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -8,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "contact") // 明确指定表名
 public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Contact {
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 
-    @Column(name = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     // 默认构造函数
@@ -46,6 +46,11 @@ public class Contact {
 
     public int getId() {
         return Math.toIntExact(id);
+    }
+
+    // 添加 setCreateTime 方法
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
     public String getName() {
@@ -95,5 +100,9 @@ public class Contact {
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
+
+    @Column(name = "created_by")
+    private String createdBy;
+
 }
 

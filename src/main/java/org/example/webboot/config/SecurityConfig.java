@@ -3,37 +3,67 @@ package org.example.webboot.config;
 import org.example.webboot.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // 注入 JwtAuthenticationFilter
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors().and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                .antMatchers("/images/**").permitAll()  // 允许访问 /images/** 路径
-                .antMatchers("/api/auth/**").permitAll() // 允许认证路由的访问
-                .antMatchers("/api/contact/list").permitAll()  // 允许匿名用户访问联系人列表
-                .antMatchers("/api/user/list").permitAll()  // 允许匿名用户访问用户列表
-                .antMatchers("/api/user/info").permitAll()  // 允许访问 /api/user/info
-                .anyRequest().authenticated(); // 其他请求需要认证
+                .antMatchers(HttpMethod.GET, "/api/contact/list").permitAll()  // 允许匿名访问联系人列表
+                .antMatchers(HttpMethod.POST, "/api/contact").permitAll()  // 新增这一行，允许匿名新增联系人
+                .antMatchers(HttpMethod.DELETE, "/api/contact/**").permitAll()  // 允许匿名删除联系人
+                .antMatchers("/api/contact/**").authenticated()  // 对其他请求需要认证
+                .antMatchers("/api/auth/**").permitAll()  // 允许匿名访问认证相关接口
+                .antMatchers("/images/**").permitAll()  // 允许匿名访问图片
+                .antMatchers("/api/user/info").permitAll()  // 允许匿名访问用户信息
+                .anyRequest().authenticated()  // 其他请求需要认证
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                });
 
-        // 将 JWT 过滤器加入到 Spring Security 的过滤链中
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // 前端地址
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

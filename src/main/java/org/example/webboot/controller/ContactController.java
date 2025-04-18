@@ -1,16 +1,22 @@
 package org.example.webboot.controller;
 
 import org.example.webboot.dto.ContactDTO;
+import org.example.webboot.dto.ErrorResponse;
 import org.example.webboot.entity.Contact;
+import org.example.webboot.exception.ContactNotFoundException;
+import org.example.webboot.exception.UnauthorizedAccessException;
 import org.example.webboot.repository.ContactRepository;
 import org.example.webboot.service.ContactService;
+import org.example.webboot.util.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
@@ -24,6 +30,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/contact")
 public class ContactController {
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
 
     @Autowired
     private ContactService contactService;
@@ -96,9 +106,21 @@ public class ContactController {
     }
 
     // 删除联系人
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteContact(@PathVariable Long id) {
-        contactService.deleteContact(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/api/contact/{id}")
+    public ResponseEntity<String> deleteContact(@PathVariable Long id) {
+        try {
+            // 检查联系人是否存在
+            if (!contactRepository.existsById(id)) {
+                return ResponseEntity.status(404).body("联系人不存在");
+            }
+            log.info("尝试删除联系人 ID: {}", id);
+            // 删除联系人
+            contactRepository.deleteById(id);
+            return ResponseEntity.ok("删除成功");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("删除失败: 存在关联数据");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("删除失败: " + e.getMessage());
+        }
     }
 }

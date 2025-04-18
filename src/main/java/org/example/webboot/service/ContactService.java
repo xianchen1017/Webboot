@@ -1,6 +1,9 @@
 package org.example.webboot.service;
 
 import org.example.webboot.controller.ContactController;
+import org.example.webboot.exception.ContactNotFoundException;
+import org.example.webboot.exception.UnauthorizedAccessException;
+import org.example.webboot.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.example.webboot.dto.ContactDTO;
@@ -10,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,10 +27,15 @@ import java.util.stream.Collectors;
 public class ContactService {
 
     private static final Logger log = LoggerFactory.getLogger(ContactController.class);
-
+    private final UserRepository userRepository;
 
     @Autowired
-    private ContactRepository contactRepository; // 使用Spring Data JPA 的 repository
+    private final ContactRepository contactRepository; // 使用Spring Data JPA 的 repository
+
+    public ContactService(UserRepository userRepository, ContactRepository contactRepository) {
+        this.userRepository = userRepository;
+        this.contactRepository = contactRepository;
+    }
 
     // 获取所有联系人
     public List<ContactDTO> getAllContacts() {
@@ -102,8 +113,10 @@ public class ContactService {
     }
 
     // 删除联系人
-    public void deleteContact(int id) {
-        contactRepository.deleteById((long) id); // 使用 Spring Data JPA 的删除方法
+    public void deleteContact(Long id) {
+        Contact contact = contactRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("联系人不存在"));
+        contactRepository.delete(contact); // 删除操作
     }
 
     // 将 ContactDTO 转换为实体
@@ -134,16 +147,13 @@ public class ContactService {
 
     // 新增联系人
     public Contact addContact(Contact contact) {
+        contact.setCreateTime(LocalDateTime.now());
         return contactRepository.save(contact);
     }
 
     // 更新联系人
-    public Contact updateContact( Contact contact) {
+    public Contact updateContact(Contact contact) {
         return contactRepository.save(contact);
     }
 
-    // 删除联系人
-    public void deleteContact(Long id) {
-        contactRepository.deleteById(id);
-    }
 }
