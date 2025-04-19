@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/contact/list").permitAll()  // 允许匿名访问联系人列表
                 .antMatchers(HttpMethod.POST, "/api/contact").permitAll()  // 新增这一行，允许匿名新增联系人
                 .antMatchers(HttpMethod.DELETE, "/api/contact/**").permitAll()  // 允许匿名删除联系人
+                .antMatchers(HttpMethod.PUT, "/api/contact/**").permitAll()  // 允许匿名删除联系人
                 .antMatchers("/api/contact/**").authenticated()  // 对其他请求需要认证
                 .antMatchers("/api/auth/**").permitAll()  // 允许匿名访问认证相关接口
                 .antMatchers("/images/**").permitAll()  // 允许匿名访问图片

@@ -29,7 +29,7 @@ public class Contact {
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createTime;
 
     // 默认构造函数

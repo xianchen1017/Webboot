@@ -1,6 +1,9 @@
 package org.example.webboot.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +13,13 @@ public class JwtConfig {
     private String secret;
     private long expirationInMs;
     private long refreshExpirationInMs;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // 注册 JavaTimeModule
+        return objectMapper;
+    }
 
     // Getters and Setters
     public String getSecret() {
