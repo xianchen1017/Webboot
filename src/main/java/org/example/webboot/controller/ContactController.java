@@ -106,21 +106,25 @@ public class ContactController {
     }
 
     // 删除联系人
-    @DeleteMapping("/api/contact/{id}")
-    public ResponseEntity<String> deleteContact(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteContact(@PathVariable Long id) { // 直接使用 Long 类型
         try {
-            // 检查联系人是否存在
-            if (!contactRepository.existsById(id)) {
-                return ResponseEntity.status(404).body("联系人不存在");
+            boolean isDeleted = contactService.deleteContact(id);
+            if (isDeleted) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
             }
-            log.info("尝试删除联系人 ID: {}", id);
-            // 删除联系人
-            contactRepository.deleteById(id);
-            return ResponseEntity.ok("删除成功");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(409).body("删除失败: 存在关联数据");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("删除失败: " + e.getMessage());
+            log.error("删除联系人失败", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "删除联系人失败",
+                            "message", e.getMessage(),
+                            "timestamp", LocalDateTime.now()
+                    ));
         }
     }
+
+
 }

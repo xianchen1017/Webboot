@@ -3,7 +3,7 @@ package org.example.webboot.dto;
 import org.example.webboot.entity.Contact;
 
 public class ContactDTO {
-    private int id;
+    private Long id;
     private String name;
     private String province;
     private String city;
@@ -26,11 +26,11 @@ public class ContactDTO {
     }
 
     // getters and setters
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -12,7 +12,7 @@ import java.util.Date;
 public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // 确保是 Long 类型
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;
@@ -35,17 +35,8 @@ public class Contact {
     // 默认构造函数
     public Contact() {}
 
-    // 用于测试数据的构造函数
-    public Contact(String name, String province, String city, String address, String postalCode) {
-        this.name = name;
-        this.province = province;
-        this.city = city;
-        this.address = address;
-        this.postalCode = postalCode;
-    }
-
-    public int getId() {
-        return Math.toIntExact(id);
+    public Long getId() {
+        return id;
     }
 
     // 添加 setCreateTime 方法

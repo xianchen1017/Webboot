@@ -5,6 +5,8 @@ import org.example.webboot.dto.ListResult;
 import org.example.webboot.entity.Contact;
 import org.example.webboot.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,9 +51,16 @@ public class UserController {
         return contactService.updateContact(id, contactDTO);
     }
 
+    // 删除联系人
     @DeleteMapping("/{id}")
-    public void deleteContact(@PathVariable int id) {
-        contactService.deleteContact((long) id);
+    public ResponseEntity<Void> deleteContact(@PathVariable Long id) {  // id 类型改为 Long
+        boolean isDeleted = contactService.deleteContact(id);  // 使用 Long 类型的 id
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
+
 }
 

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,7 +93,7 @@ public class ContactService {
     }
 
     // 根据ID获取联系人
-    public ContactDTO getContactById(int id) {
+    public ContactDTO getContactById(long id) {
         Contact contact = contactRepository.findById((long) id).orElseThrow(() -> new RuntimeException("Contact not found"));
         return convertToDTO(contact);
     }
@@ -113,11 +114,16 @@ public class ContactService {
     }
 
     // 删除联系人
-    public void deleteContact(Long id) {
-        Contact contact = contactRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("联系人不存在"));
-        contactRepository.delete(contact); // 删除操作
+    public boolean deleteContact(Long id) {
+        try {
+            contactRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            log.error("删除联系人失败: {}", e.getMessage());
+            return false;
+        }
     }
+
 
     // 将 ContactDTO 转换为实体
     private Contact convertToEntity(ContactDTO dto) {

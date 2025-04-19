@@ -6,9 +6,9 @@ import org.example.webboot.entity.Contact;
 import java.util.List;
 
 public interface ContactMapper {
-    int insert(Contact contact);
-    int update(Contact contact);
-    int deleteById(int id);
-    Contact selectById(int id);
+//    int insert(Contact contact);
+//    int update(Contact contact);
+//    int deleteById(long id);
+//    Contact selectById(long id);
     List<Contact> findAllContacts();
 }
