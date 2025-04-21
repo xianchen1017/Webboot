@@ -11,6 +11,7 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "bigint") // 明确指定类型
     private Long id;
 
     private String username;

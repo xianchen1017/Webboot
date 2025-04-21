@@ -1,16 +1,21 @@
 package org.example.webboot.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import org.example.webboot.entity.Article;
 import org.example.webboot.entity.Author;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
+
+    @Query("SELECT a FROM Article a WHERE a.author.id = :authorId")
+    Page<Article> findByAuthorId(@Param("authorId") Long authorId, Pageable pageable);
 
     // 根据作者对象查询文章（分页）
     Page<Article> findByAuthor(Author author, Pageable pageable);

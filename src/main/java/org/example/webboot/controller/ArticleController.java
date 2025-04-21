@@ -1,11 +1,13 @@
 package org.example.webboot.controller;
 import org.example.webboot.entity.Article;
 import org.example.webboot.entity.Author;
+import org.example.webboot.exception.ResourceNotFoundException;
 import org.example.webboot.service.ArticleService;
 import org.example.webboot.service.AuthorService;
 import org.example.webboot.dto.AuthorStatsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
@@ -50,8 +52,18 @@ public class ArticleController {
             @PathVariable Long authorId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
+
         Author author = authorService.getAuthorById(authorId);
-        org.springframework.data.domain.Page<Article> pageResult = articleService.getArticlesByAuthor(author, page, size);
+        if (author == null) {
+            throw new ResourceNotFoundException("Author not found with id: " + authorId);
+        }
+
+        Page<Article> pageResult = articleService.getArticlesByAuthor(author, page, size);
+
+        // 添加日志输出
+        System.out.println("查询到的文章数量: " + pageResult.getContent().size());
+        pageResult.getContent().forEach(article ->
+                System.out.println("文章ID: " + article.getId() + ", 标题: " + article.getTitle()));
 
         Map<String, Object> response = new HashMap<>();
         response.put("articles", pageResult.getContent());
@@ -62,19 +74,47 @@ public class ArticleController {
         return ResponseEntity.ok(response);
     }
 
-
     // 新增文章
     @PostMapping("/article")
-    public ResponseEntity<Article> addArticle(@RequestBody Article article) {
-        Article savedArticle = articleService.addArticle(article);
-        return ResponseEntity.ok(savedArticle);
+    public ResponseEntity<?> addArticle(@RequestBody Map<String, Object> requestData) {
+        try {
+            Article article = new Article();
+            article.setTitle((String) requestData.get("title"));
+            article.setContent((String) requestData.get("content"));
+
+            Long authorId = Long.parseLong(requestData.get("authorId").toString());
+            Author author = authorService.getAuthorById(authorId);
+            if (author == null) {
+                return ResponseEntity.badRequest().body("Author not found");
+            }
+            article.setAuthor(author);
+
+            Article savedArticle = articleService.addArticle(article);
+            return ResponseEntity.ok(savedArticle);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating article: " + e.getMessage());
+        }
     }
 
     // 编辑文章
     @PutMapping("/article/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable Long id, @RequestBody Article updatedArticle) {
-        Article article = articleService.updateArticle(id, updatedArticle);
-        return ResponseEntity.ok(article);
+    public ResponseEntity<?> updateArticle(@PathVariable Long id, @RequestBody Map<String, String> requestData) {
+        try {
+            Article existingArticle = articleService.getArticleById(id);
+            if (existingArticle == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            existingArticle.setTitle(requestData.get("title"));
+            existingArticle.setContent(requestData.get("content"));
+
+            Article updatedArticle = articleService.updateArticle(existingArticle);
+            return ResponseEntity.ok(updatedArticle);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating article: " + e.getMessage());
+        }
     }
 
     // 删除文章

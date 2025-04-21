@@ -6,19 +6,22 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "articles")
 public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
-    private String content;
-    private String category;
-    private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
+    @Lob
+    private String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "articles_ibfk_1"))
     private Author author;
 
     // Getter 和 Setter 方法
@@ -39,22 +42,6 @@ public class Article {
         this.title = title;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Author getAuthor() {
         return author;
     }
@@ -68,5 +55,13 @@ public class Article {
             return this.author.getId(); // 获取作者的 ID
         }
         return null;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }
