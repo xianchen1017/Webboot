@@ -44,7 +44,8 @@ public class SecurityConfig {
                 .antMatchers("/api/auth/**").permitAll()  // 允许匿名访问认证相关接口
                 .antMatchers("/images/**").permitAll()  // 允许匿名访问图片
                 .antMatchers("/api/user/info").permitAll()  // 允许匿名访问用户信息
-                .anyRequest().authenticated()  // 其他请求需要认证
+                .antMatchers("/api/authors", "/api/author/**", "/api/article/**").permitAll() // 确保这些路径是认证后可访问
+                .anyRequest().permitAll() // 其他请求可以不进行认证
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()

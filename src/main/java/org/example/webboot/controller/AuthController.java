@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.webboot.dto.LoginDTO;
 import org.example.webboot.dto.PasswordDTO;
 import org.example.webboot.dto.RegisterDTO;
-import org.example.webboot.dto.UserLoginResponse;
 import org.example.webboot.entity.User;
 import org.example.webboot.service.UserService;
 import org.example.webboot.util.JwtTokenProvider;
 import org.example.webboot.util.ResponseResult;
-import org.example.webboot.service.AuthService; // 导入 AuthService
+import org.example.webboot.service.AuthorService; // 导入 AuthService
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
-    private AuthService authService; // 注入 AuthService
+    private AuthorService authService; // 注入 AuthService
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;  // 注入 JwtTokenProvider

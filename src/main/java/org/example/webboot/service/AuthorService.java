@@ -1,17 +1,27 @@
 package org.example.webboot.service;
 
+import org.example.webboot.dto.AuthorStatsDTO;
+import org.example.webboot.entity.Author;
 import org.example.webboot.entity.User;
 import org.example.webboot.dto.LoginDTO;
+import org.example.webboot.repository.AuthorRepository;
 import org.example.webboot.repository.UserRepository;
 import org.example.webboot.util.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page; // 确保导入的是Spring的Page
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder; // 导入 PasswordEncoder
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
-public class AuthService {
+public class AuthorService {
+
+    @Autowired
+    private AuthorRepository authorRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -54,6 +64,21 @@ public class AuthService {
         }
 
         return true;  // 密码正确
+    }
+
+    // 根据ID获取作者
+    public Author getAuthorById(Long id) {
+        return authorRepository.findById(id).orElseThrow(() -> new RuntimeException("Author not found"));
+    }
+
+    public Page<Author> getAuthors(PageRequest pageable) {
+        return authorRepository.findAll((Pageable) pageable);
+    }
+
+
+    public List<AuthorStatsDTO> getAuthorsWithArticleCount() {
+        // 使用JPQL查询
+        return authorRepository.findAuthorsWithArticleCount();
     }
 }
 
