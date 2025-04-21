@@ -1,5 +1,6 @@
 package org.example.webboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.example.webboot.entity.Author;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "articles")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Article {
 
     @Id

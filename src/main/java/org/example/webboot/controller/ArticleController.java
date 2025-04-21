@@ -1,4 +1,5 @@
 package org.example.webboot.controller;
+import org.example.webboot.dto.ArticleDTO;
 import org.example.webboot.entity.Article;
 import org.example.webboot.entity.Author;
 import org.example.webboot.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,21 +101,34 @@ public class ArticleController {
 
     // 编辑文章
     @PutMapping("/article/{id}")
-    public ResponseEntity<?> updateArticle(@PathVariable Long id, @RequestBody Map<String, String> requestData) {
+    public ResponseEntity<?> updateArticle(@PathVariable Long id, @RequestBody ArticleDTO articleDTO) {
         try {
             Article existingArticle = articleService.getArticleById(id);
             if (existingArticle == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            existingArticle.setTitle(requestData.get("title"));
-            existingArticle.setContent(requestData.get("content"));
+            // 更新字段
+            existingArticle.setTitle(articleDTO.getTitle());
+            existingArticle.setContent(articleDTO.getContent());
 
-            Article updatedArticle = articleService.updateArticle(existingArticle);
-            return ResponseEntity.ok(updatedArticle);
+            Article result = articleService.updateArticle(existingArticle);
+
+            // 转换为DTO返回
+            ArticleDTO responseDTO = new ArticleDTO();
+            responseDTO.setId(result.getId());
+            responseDTO.setTitle(result.getTitle());
+            responseDTO.setContent(result.getContent());
+            responseDTO.setAuthorId(result.getAuthor() != null ? result.getAuthor().getId() : null);
+
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating article: " + e.getMessage());
+                    .body(Map.of(
+                            "error", "更新文章失败",
+                            "message", e.getMessage(),
+                            "timestamp", LocalDateTime.now()
+                    ));
         }
     }
 

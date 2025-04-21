@@ -77,17 +77,44 @@ public class ArticleService {
     }
 
     // 删除文章后更新作者的文章数量
+    @Transactional
     public void deleteArticle(Long articleId) {
-        Article article = articleRepository.findById(articleId).orElseThrow(() -> new RuntimeException("Article not found"));
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+
+        // 先获取作者引用
+        Author author = article.getAuthor();
+
+        // 删除文章
         articleRepository.delete(article);
-        updateAuthorArticleCount(article.getAuthor()); // 传入作者对象
+
+        // 立即刷新数据库，确保删除操作提交
+        articleRepository.flush();
+
+        // 更新作者文章计数
+        updateAuthorArticleCount(author);
     }
 
     // 更新作者的文章数量
     private void updateAuthorArticleCount(Author author) {
-        int articleCount = articleRepository.countByAuthor(author); // 使用author对象来查询
-        author.setArticleCount(articleCount); // 更新文章数量
-        authorRepository.save(author); // 保存更新后的作者
+        // 使用新的查询获取准确计数，避免缓存影响
+        int count = articleRepository.countByAuthor(author);
+        author.setArticleCount(count);
+        authorRepository.saveAndFlush(author); // 立即刷新到数据库
+    }
+
+    @Transactional
+    public Article updateArticle(Long id, Article updatedArticle) {
+        Article existingArticle = articleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+
+        existingArticle.setTitle(updatedArticle.getTitle());
+        existingArticle.setContent(updatedArticle.getContent());
+
+        Article saved = articleRepository.save(existingArticle);
+        articleRepository.flush(); // 立即刷新变更
+
+        return saved;
     }
 
     // 搜索文章
