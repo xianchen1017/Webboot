@@ -53,12 +53,15 @@ public class UserService {
     public User registerUser(RegisterDTO registerDTO, MultipartFile avatar) {
         // 直接保存明文密码
         String password = registerDTO.getPassword();  // 明文密码
-        String avatarPath = fileService.saveAvatar(avatar);  // 获取头像的相对路径
+        String avatarPath = fileService.saveAvatar(avatar);
+        if (avatarPath == null) {
+            throw new RuntimeException("头像保存失败");
+        }
         // 创建并保存用户
         User user = new User();
         user.setUsername(registerDTO.getUsername());
         user.setPassword(password);  // 保存明文密码
-        user.setAvatar(fileService.saveAvatar(avatar));
+        user.setAvatar(avatarPath);
         user.setEmail(registerDTO.getEmail());  // 确保 email 字段被设置
         user.setRole(registerDTO.getRole()); // 设置用户角色
         // 保存到数据库

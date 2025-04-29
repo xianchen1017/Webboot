@@ -3,10 +3,8 @@ package org.example.webboot.entity;
 import org.example.webboot.dto.UserDTO;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +16,7 @@ public class User {
     private String password;
     private String email;
     private String role;
+    @Column(name = "avatar")
     private String avatar;
     @CreationTimestamp
     private LocalDateTime createTime;
